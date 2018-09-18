@@ -9,6 +9,7 @@ content = Utility.read_contents_from_file('../shakespeare.txt')
 
 # Carve up a dictionary from read
 model.create_dict(content)
+model.save('../model/m_blk_txt')
 
 # Generate text of size(n)
 text = model.generate_text(30)

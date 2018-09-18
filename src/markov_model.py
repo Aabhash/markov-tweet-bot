@@ -1,5 +1,6 @@
 import twitter
 import random
+import pickle
 # from text_processor import TextProcessor
 
 
@@ -12,7 +13,7 @@ class MarkovModel:
     Create a dictionary of (key,value) pairs where key is n-gram configuration 
     """
 
-    def create_dict(self, content, ngram=3):
+    def create_dict(self, content, ngram=4):
 
         content = content.split()
         total_words = len(content) - ngram
@@ -51,21 +52,49 @@ class MarkovModel:
         return ' '.join(resultant_text)
 
     """
+    Make sure initial words are contained in seed words if they exist
+    """
+
+    def __get_seedwords(self, initials, w_c):
+        if type(initials) in [str]:
+            initials = [initials]
+        
+        while len(initials) > 0:
+            for i in range(len(self.corpus)):
+                # If initial words are in word-components
+                # Set seed words to be the word_components that contain initials
+                if initials[0] in w_c[i] or (tuple(initials[0].split()) == w_c[i]):
+                    seed_words = list(w_c[i])
+                    initials = []
+                    break
+            if len(initials) > 0: initials.pop(0)
+        
+        return seed_words
+    
+    """
     Generate a text of size n.
     """
 
-    def generate_text(self, text_length):
+    def generate_text(self, text_length, initials = ['okay', 'done']):
         if not self.corpus: print('Corpus Empty')
-
+        
         # Convert corpus dictionary into a list of word-components
         word_components = list(self.corpus)
         random.shuffle(word_components)
 
         # Get random integer to obtain one word component to start resultant sentence
         rand_int = random.randint(0, len(list(self.corpus)))
-        seed_words = list(word_components[rand_int])
-        
+        seed_words = word_components[rand_int]
+
+        # Obtain seedwords from initials if they exist in the corpus
+        seed_words = self.__get_seedwords(initials, word_components)
+
         # Obtain resultant sentence of length n, commencing from seed words
         resultant_text = self.__get_text(text_length, seed_words)
         
         return resultant_text
+
+    
+    def save(self, filename):
+        with open(filename, 'wb') as writer:
+            pickle.dump(self.corpus, writer)
