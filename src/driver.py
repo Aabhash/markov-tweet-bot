@@ -4,11 +4,8 @@ from utility import Utility
 # Create MarkovModel object to formulate tweets
 model = MarkovModel()
 
-# Read content from file
-content = Utility.read_contents_from_file('../shakespeare.txt')
-
 # Carve up a dictionary from read
-model.create_dict(content)
+model.read('../shakespeare.txt')
 model.save('../model/m_blk_txt')
 
 # Generate text of size(n)
