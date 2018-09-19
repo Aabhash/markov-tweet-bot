@@ -1,6 +1,6 @@
-import twitter
 import random
 import pickle
+import copy
 from utility import Utility
 # from text_processor import TextProcessor
 
@@ -8,6 +8,7 @@ from utility import Utility
 class MarkovModel:
     def __init__(self):
         self.corpus = {}
+        self.resp_corpus = {}
 
 
     """
@@ -88,7 +89,7 @@ class MarkovModel:
         word_components = list(self.corpus)
         random.shuffle(word_components)
 
-        # Get random integer to obtain one word component to start resultant sentence
+        # Get random integer to obtain one 'word component' to start resultant sentence
         rand_int = random.randint(0, len(list(self.corpus)))
         seed_words = word_components[rand_int]
 
@@ -107,3 +108,41 @@ class MarkovModel:
     def save(self, filename):
         with open(filename, 'wb') as writer:
             pickle.dump(self.corpus, writer)
+
+
+    """
+    Load the saved pickle data
+    """    
+    def load(self, filename):
+
+        #Raise error if file does not exist
+        if not Utility.check_integrity(filename):
+            Utility.error('markov_model.load', 'File does not exist {0}'.format(filename))
+        
+        with open(filename, 'rb') as reader:
+            data = pickle.load(reader)
+        
+        # Overwrite the corpus
+        self.corpus = copy.deepcopy(data)
+
+        del data
+
+
+    """
+    Load response corpus for short responses
+    """
+
+    def load_resp(self, respdict):
+        try:
+            # Add (key,value) pairs in dictionary to corpus
+            for key in respdict.keys():
+                value = respdict[key]
+
+                if type(value) is str:
+                    self.resp_corpus[key] = (respdict[key])
+                else:
+                    multi_resp = map(str, list(value))
+                    self.resp_corpus[key] = tuple(multi_resp)
+        except:
+            Utility.error('load_resp', 'Error loading response corpus')
+        

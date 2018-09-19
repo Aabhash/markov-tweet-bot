@@ -6,8 +6,12 @@ class Utility:
             content = reader.read()
         return content
 
-    # def _error():
+    @staticmethod
+    def error(method, message):
+        raise Exception('Error {0} {1}'.format(method, message))
+        
 
-    # def _isalphapunct():
-
-    # def _self_examination(): 
+    @staticmethod
+    def check_integrity(filename):
+        filepath_exists = os.path.isfile(filename)
+        return filepath_exists
