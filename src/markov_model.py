@@ -62,7 +62,7 @@ class MarkovModel:
     Make sure initial words are contained in seed words if they exist
     """
 
-    def __get_seedwords(self, initials, w_c):
+    def __get_seedwords(self, seed_words, initials, w_c):
         if type(initials) in [str]:
             initials = [initials]
         
@@ -76,7 +76,7 @@ class MarkovModel:
                     break
             if len(initials) > 0: initials.pop(0)
         
-        return seed_words
+        return list(seed_words)
     
     """
     Generate a text of size n.
@@ -94,7 +94,7 @@ class MarkovModel:
         seed_words = word_components[rand_int]
 
         # Obtain seedwords from initials if they exist in the corpus
-        seed_words = self.__get_seedwords(initials, word_components)
+        seed_words = self.__get_seedwords(seed_words, initials, word_components)
 
         # Obtain resultant sentence of length n, commencing from seed words
         resultant_text = self.__get_text(text_length, seed_words)
