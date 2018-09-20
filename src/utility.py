@@ -15,3 +15,7 @@ class Utility:
     def check_integrity(filename):
         filepath_exists = os.path.isfile(filename)
         return filepath_exists
+
+    @staticmethod
+    def log(method, message):
+        print('Log: {0} {1}'.format(method, message))

@@ -12,3 +12,12 @@ class TextProcessor:
                 text[i].upper()
         return text
 
+    @staticmethod
+    def clean(text):
+        for i in range(len(text)):
+            text[i] = text[i].replace(u'@',u''). \
+					    replace(u'#',u'').replace(u'.',u''). \
+						replace(u',',u'').replace(u';',u''). \
+						replace(u':',u'').replace(u'!',u''). \
+						replace(u'?',u'').replace(u"'",u'')
+
