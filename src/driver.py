@@ -6,14 +6,8 @@ from tweeter import Tweeter
 model = MarkovModel()
 
 # Carve up a dictionary from read
-model.read('../shakespeare.txt')
+model.read('../thor.txt')
 model.save('../model/m_blk_txt')
-
-# Generate text of size(n)
-text = model.generate_text(30)
-
-# print(model.corpus)
-print(text)
 
 tweeter = Tweeter()
 c_key = ''
@@ -22,11 +16,12 @@ a_token = ''
 a_secret = ''
 
 tweeter.login(c_key, c_secret, a_token, a_secret)
-targetString = 'Shakespeare'
-keywords = ['Romeo', 'Juliet']
-prefix = None
-suffix = '#cool'
+
+keywords = ['THOR', 'Banner']
+prefix = ''
+suffix = '#Avengers'
 
 # tweeter.t_areply_start(targetString, keywords=keywords, prefix=None, suffix='#TestBot')
-tweeter.start_tweeting(days=0, hours=0, mins=0, keywords=keywords, prefix=None, suffix='#TestBot')
-tweeter._autotweet()
+tweeter.start_tweeting(days=0, hours=0, mins=0, keywords=keywords, prefix=prefix, suffix=suffix)
+# print(model.corpus)
+tweeter._autotweet(model)

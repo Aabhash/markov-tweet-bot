@@ -2,21 +2,19 @@ import random
 import pickle
 import copy
 from utility import Utility
-# from text_processor import TextProcessor
+from text_processor import TextProcessor
 
 
 class MarkovModel:
     def __init__(self):
         self.corpus = {}
-        self.resp_corpus = {}
-
 
     """
     Create a dictionary of (key,value) pairs where key is n-gram configuration,
-    from a fle 
+    from a file 
     """
 
-    def read(self, filename, ngram=4):
+    def read(self, filename, ngram=2):
 
         # Read contents from a file
         content  = Utility.read_contents_from_file(filename)
@@ -56,6 +54,8 @@ class MarkovModel:
                 words[word_size] = random.choice(self.corpus[ngrams])
 
         resultant_text.append(words[word_size])
+        resultant_text[0] = resultant_text[0].capitalize()
+
         return ' '.join(resultant_text)
 
     """
@@ -126,23 +126,4 @@ class MarkovModel:
         self.corpus = copy.deepcopy(data)
 
         del data
-
-
-    """
-    Load response corpus for short responses
-    """
-
-    def load_resp(self, respdict):
-        try:
-            # Add (key,value) pairs in dictionary to corpus
-            for key in respdict.keys():
-                value = respdict[key]
-
-                if type(value) is str:
-                    self.resp_corpus[key] = (respdict[key])
-                else:
-                    multi_resp = map(str, list(value))
-                    self.resp_corpus[key] = tuple(multi_resp)
-        except:
-            Utility.error('load_resp', 'Error loading response corpus')
         
