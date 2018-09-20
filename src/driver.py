@@ -16,10 +16,10 @@ text = model.generate_text(30)
 print(text)
 
 tweeter = Tweeter()
-c_key = 'LV9wtszZNS27dyET3aoPcU4xp'
-c_secret = '4Z1CWVKGIxQReLjXghWiYwbHnnaPGSBdnDy62dlJ3FDXG9hB52'
-a_token = '132850584-JB4wjiYZrfrKpboRPORgVq9lvxY9PADq1pYOVeEg'
-a_secret = '5xnhx2Wjj96T3lSPk8GCIqrK245NHRoX0inhwBVR07mCQ'
+c_key = ''
+c_secret = ''
+a_token = ''
+a_secret = ''
 
 tweeter.login(c_key, c_secret, a_token, a_secret)
 targetString = 'Shakespeare'
@@ -27,5 +27,6 @@ keywords = ['Romeo', 'Juliet']
 prefix = None
 suffix = '#cool'
 
-tweeter.t_areply_start(targetString, keywords=keywords, prefix=None, suffix='#TestBot')
-tweeter.start_tweeting(days=0, hours=19, mins=30, keywords=keywords, prefix=None, suffix='#TestBot')
+# tweeter.t_areply_start(targetString, keywords=keywords, prefix=None, suffix='#TestBot')
+tweeter.start_tweeting(days=0, hours=0, mins=0, keywords=keywords, prefix=None, suffix='#TestBot')
+tweeter._autotweet()

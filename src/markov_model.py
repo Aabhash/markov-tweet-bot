@@ -66,7 +66,7 @@ class MarkovModel:
         if type(initials) in [str]:
             initials = [initials]
         
-        while len(initials) > 0:
+        while initials and len(initials) > 0:
             for i in range(len(self.corpus)):
                 # If initial words are in word-components
                 # Set seed words to be the word_components that contain initials
