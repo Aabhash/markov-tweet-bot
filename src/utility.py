@@ -11,7 +11,7 @@ class Utility:
 
     @staticmethod
     def error(method, message):
-        raise Exception('Error {0} {1}'.format(method, message))
+        raise Exception('Error :- [{0}] {1}'.format(method, message))
 
     @staticmethod
     def check_integrity(filename):
@@ -20,4 +20,4 @@ class Utility:
 
     @staticmethod
     def log(method, message):
-        print('Log: [{0}] {1}'.format(method, message))
+        print('Log Message :- [{0}] {1}'.format(method, message))

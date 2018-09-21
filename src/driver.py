@@ -1,40 +1,53 @@
 from markov_model import MarkovModel
 from utility import Utility
 from tweeter import Tweeter
+import sys
 
-"""
-Create MarkovModel object to formulate tweets
-"""
-model = MarkovModel()
+def main():
+    # Load paramters from command line parameters
+    try:
+        load = sys.argv[1]
+        filename = sys.argv[2]
+        keyword = sys.argv[3]
+        prefix = sys.argv[4]
+        suffix = sys.argv[5]
+    except Exception:
+        Utility.error('main','Error in passed parameters.')
+     
+    """
+    Create MarkovModel object to formulate tweets
+    """
+    model = MarkovModel()
 
-"""
-Carve up a dictionary from read
-"""
-# model.read('../data/thor.txt')
-# model.save('../model/m_blk_thor')
+    if load in ['-l','-L']:
+        # Load a already saved model
+        Utility.log('main', 'Loading model from file {0}'.format(filename))
+        model.load('../model/m_blk_{0}'.format(filename))
+    elif load in ['-r','-R']:
+        # Carve up a dictionary from read
+        Utility.log('Training model from file {0}, and saving.'.format(filename))
+        model.read('../data/{0}'.format(filename))
+        model.save('../model/m_blk_{0}'.format(filename.split('.')[0]))
+    else:
+        Utility.error('main', 'Invalid parameters')
 
-"""
-Load a already saved model
-"""
-model.load('../model/m_blk_politics')
+    """
+    Tweeter object and related credentials
+    """
+    tweeter = Tweeter()
 
-"""
-Tweeter object and related credentials
-"""
-tweeter = Tweeter()
-c_key = ''
-c_secret = ''
-a_token = '-'
-a_secret = ''
+    c_key = ''
+    c_secret = ''
+    a_token = '-'
+    a_secret = ''
 
-"""
-Login to twitter using above credentials
-"""
-tweeter.login(c_key, c_secret, a_token, a_secret)
+    """
+    Login to twitter using above credentials
+    """
+    tweeter.login(c_key, c_secret, a_token, a_secret)
 
-keywords = ['']
-prefix = ''
-suffix = '#TestBot'
+    tweeter.start_tweeting(days=0, hours=0, mins=1, keywords=keywords.split(), prefix=prefix, suffix=suffix)
+    tweeter._autotweet(model)
 
-tweeter.start_tweeting(days=0, hours=0, mins=1, keywords=keywords, prefix=prefix, suffix=suffix)
-tweeter._autotweet(model)
+if __name__ == '__main__':
+    main()
