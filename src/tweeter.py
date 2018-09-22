@@ -114,8 +114,9 @@ class Tweeter:
     Core tweeting logic
     """
 
-    def _autotweet(self, model):
-        while self._autotweet_flag:
+    def _autotweet(self, model, n_tweets = 10):
+        t_count = 0
+        while self._autotweet_flag and t_count < n_tweets:
             if self._logged_in and self._autotweet_flag:
                 keyword = None
                 if self._keywords is not None:
@@ -143,6 +144,7 @@ class Tweeter:
                 interval = self._interval + jitter
                 Utility.log('tweeter.autotweet', 'Sleeping for {0} seconds'.format(interval))
                 time.sleep(interval)
+            t_count += 1
 
     """
     Construct tweet by adding prefix, suffix and limiting tweet to 140 characters

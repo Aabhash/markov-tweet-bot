@@ -11,6 +11,7 @@ def main():
         keyword = sys.argv[3]
         prefix = sys.argv[4]
         suffix = sys.argv[5]
+        n_tweets = sys.argv[6]
     except Exception:
         Utility.error('main','Error in passed parameters.')
      
@@ -38,16 +39,21 @@ def main():
 
     c_key = ''
     c_secret = ''
-    a_token = '-'
+    a_token = ''
     a_secret = ''
 
     """
     Login to twitter using above credentials
     """
     tweeter.login(c_key, c_secret, a_token, a_secret)
+    
+    try:
+        tweeter.start_tweeting(days=0, hours=0, mins=1, keywords=keyword.split(), prefix=prefix, suffix=suffix)
+        tweeter._autotweet(model, int(n_tweets))
+        Utility.log('main', 'Exiting program ...')
+    except KeyboardInterrupt:
+        Utility.log('main', 'Terminating program ...')
 
-    tweeter.start_tweeting(days=0, hours=0, mins=1, keywords=keywords.split(), prefix=prefix, suffix=suffix)
-    tweeter._autotweet(model)
 
 if __name__ == '__main__':
     main()
