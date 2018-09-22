@@ -26,8 +26,8 @@ def main():
         model.load('../model/m_blk_{0}'.format(filename))
     elif load in ['-r','-R']:
         # Carve up a dictionary from read
-        Utility.log('Training model from file {0}, and saving.'.format(filename))
-        model.read('../data/{0}'.format(filename))
+        Utility.log('main', 'Training model from file {0}, and saving.'.format(filename))
+        model.read('../data/{0}.txt'.format(filename))
         model.save('../model/m_blk_{0}'.format(filename.split('.')[0]))
     else:
         Utility.error('main', 'Invalid parameters')
