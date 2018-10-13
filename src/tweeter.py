@@ -54,14 +54,9 @@ class Tweeter:
     Start auto tweets
     """
 
-    def start_tweeting(self, days=1, hours=0, mins=0, jitter=0, keywords=None, prefix=None, suffix=None):
-        for i in [days, hours, mins]:
-            if i <= 0 or i is None: i = 0
-
-        interval = (days * 1440) + (60 * hours) + mins
-        if interval == 0: interval = 1440
-
-        self._interval = interval
+    def start_tweeting(self, time=0, jitter=0, keywords=None, prefix=None, suffix=None):
+        
+        self._interval = time
         self._jitter = jitter
         self._keywords = keywords
         self._prefix = prefix
@@ -128,7 +123,7 @@ class Tweeter:
                 prefix = self._get_prefix_in_tweet()
                 suffix = self._get_suffix_in_tweet()
 
-                new_tweet = self._construct_tweet(model, seedword=keyword, prefix=prefix, suffix=suffix)
+                new_tweet = self._construct_new_tweet(model, seedword=keyword, prefix=prefix, suffix=suffix)
                 self._t_lock.acquire(True)
 
                 try:
@@ -147,10 +142,10 @@ class Tweeter:
             t_count += 1
 
     """
-    Construct tweet by adding prefix, suffix and limiting tweet to 140 characters
+    Construct tweet by adding prefix, suffix and limiting tweet to 280 characters
     """
 
-    def _construct_tweet(self, model, seedword=None, prefix=None, suffix=None):
+    def _construct_new_tweet(self, model, seedword=None, prefix=None, suffix=None):
         max_words = 20
         response = ''
         while response == '' or len(response) > 280:
