@@ -7,6 +7,7 @@ import copy
 import random
 import pandas
 import json
+import csv
 
 
 class Tweeter:
@@ -39,7 +40,6 @@ class Tweeter:
         # Login
         self._logged_in = False
         self._credentials = None
-
 
     """
     Login to twitter using credentials provided
@@ -134,12 +134,12 @@ class Tweeter:
 
                 # jitter = random.randint(-self._jitter, self._jitter)
                 Utility.log('tweeter.autotweet', 'Sleeping for {0} seconds'.format(self._interval))
-                time.sleep(interval) 
+                time.sleep(self._interval) 
             t_count += 1
 
 
     @staticmethod
-    def tweet(self, tweet):
+    def tweet(new_tweet):
         try:
             # tweet = self._t_auth.statuses.update(status = new_tweet)
             Utility.log('tweeter.autotweet', 'Wrote tweet: {0}'.format(new_tweet))
@@ -167,6 +167,7 @@ class Tweeter:
 
         return response
     
+    
     """
     Read 'n' number of tweets containing keywords in db/include.txt file using TwitterStream
     """
@@ -183,7 +184,12 @@ class Tweeter:
                 tweet = it.__next__()
             except StopIteration:
                 continue
-            if tweet['user']['id_str'] != self._credentials['id_str'] and 'retweeted_status' not in tweet.keys():
+            # Filter conditions:
+            # 1. No hangup message
+            # 2. Not self-tweeted
+            # 3. No Retweets
+            # 4. No Replies
+            if 'hangup' not in tweet.keys() and tweet['user']['id_str'] != self._credentials['id_str'] and 'retweeted_status' not in tweet.keys() and '@' not in tweet['text'][0]:
                 acceptable_tweets.append(tweet) 
                 tweet_count += 1
         return acceptable_tweets
@@ -192,27 +198,47 @@ class Tweeter:
     """
     Dump necessary information of tweets in a json file
     """
-    def store(self, tweets, db = '../db/db.json'):
-        store_dict = {}
+    @staticmethod
+    def store(tweets, db = '../db/db.csv'):
+        # Save desired attributes of tweet to a csv file
+        with open (db, 'w', encoding="utf-8", newline='') as csv_file:
+            
+            fieldnames = ['id', 'rts', 'favs', 'text']
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            # writer.writeheader()
+            for tweet in tweets:
+                try:
+                    # Create a dictionary to hold all data
+                    csv_dict = {}
+                    csv_dict['id'] = tweet['id']
+                    csv_dict['rts'] = tweet['retweet_count']
+                    csv_dict['favs']= tweet['favorite_count']
+                    
+                    if 'extended_tweet' in tweet.keys():
+                        csv_dict['text'] = tweet['extended_tweet']['full_text']
+                    else:
+                        csv_dict['text'] = tweet['text']
 
-        # Populate the dictionary taking desired attributes from tweets
-        for tweet in tweets:
-            store_dict['id'] = tweet['id']
-            store_dict['content'] = {}
-            if 'extended_tweet' in tweet.keys():
-                hashtags = ' '.join(tweet['extended_tweet']['entities']['hashtags'])
-                tweet_text = tweet['extended_tweet']['full_text']
-                store_dict['content']['text'] =  tweet_text + ' ' + hashtags 
-            else:
-                store_dict['content']['text'] = tweet['text']
-            store_dict['content']['rts'] = tweet['retweet_count']
-            store_dict['content']['favs']= tweet['favorite_count']
-        print(store_dict)
-        
-        # Save to a json file
-        with open (db, 'a') as fp:
-            json.dump(store_dict, fp)
+                except TypeError:
+                     Utility.error('tweeter.store', 'Type Error encountered')
 
+                # Write above dictionary as a row
+                writer.writerow(csv_dict)
     
-    def amplify(self):
-        return
+    @staticmethod
+    def amplify_tweets(n = 1, timeout = 60, db = '../db/db.csv'):
+        dataframe = None
+        if db is not None:
+            dataframe = pandas.read_csv(db, header=None)
+        dataframe.sort_values(1)
+        # print(dataframe)
+
+        count = 0
+        while count < n and not dataframe.empty:
+            tweet = dataframe.iat[0, 3]
+            dataframe = dataframe.drop(dataframe.index[0])
+            count += 1
+            Tweeter.tweet(tweet)
+            time.sleep(timeout)
+        
+        dataframe.to_csv(db, header=False, index=False)
