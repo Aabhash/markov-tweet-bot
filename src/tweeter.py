@@ -5,6 +5,8 @@ import time
 from threading import Thread, Lock
 import copy
 import random
+import pandas
+import json
 
 
 class Tweeter:
@@ -37,6 +39,7 @@ class Tweeter:
         # Login
         self._logged_in = False
         self._credentials = None
+
 
     """
     Login to twitter using credentials provided
@@ -109,7 +112,7 @@ class Tweeter:
     Core tweeting logic
     """
 
-    def _autotweet(self, model, n_tweets = 10):
+    def _autoconstruct(self, model, n_tweets = 10):
         t_count = 0
         while self._autotweet_flag and t_count < n_tweets:
             if self._logged_in and self._autotweet_flag:
@@ -124,22 +127,27 @@ class Tweeter:
                 suffix = self._get_suffix_in_tweet()
 
                 new_tweet = self._construct_new_tweet(model, seedword=keyword, prefix=prefix, suffix=suffix)
+                
                 self._t_lock.acquire(True)
-
-                try:
-                    # tweet = self._t_auth.statuses.update(status = new_tweet)
-                    Utility.log('tweeter.autotweet', 'Wrote tweet: {0}'.format(new_tweet))
-                    # self._last_tweet_out = copy.deepcopy(tweet)
-                except Exception as e:
-                    Utility.error('tweeter.autotweet', 'Failed to post tweet: {0}'.format(e))
-
+                self.tweet(new_tweet)
                 self._t_lock.release()
 
-                jitter = random.randint(-self._jitter, self._jitter)
-                interval = self._interval + jitter
-                Utility.log('tweeter.autotweet', 'Sleeping for {0} seconds'.format(interval))
-                time.sleep(interval)
+                # jitter = random.randint(-self._jitter, self._jitter)
+                Utility.log('tweeter.autotweet', 'Sleeping for {0} seconds'.format(self._interval))
+                time.sleep(interval) 
             t_count += 1
+
+
+    @staticmethod
+    def tweet(self, tweet):
+        try:
+            # tweet = self._t_auth.statuses.update(status = new_tweet)
+            Utility.log('tweeter.autotweet', 'Wrote tweet: {0}'.format(new_tweet))
+            # self._last_tweet_out = copy.deepcopy(tweet)
+        except Exception as e:
+            Utility.error('tweeter.autotweet', 'Failed to post tweet: {0}'.format(e))
+
+
 
     """
     Construct tweet by adding prefix, suffix and limiting tweet to 280 characters
@@ -158,3 +166,53 @@ class Tweeter:
                 max_words -= 1
 
         return response
+    
+    """
+    Read 'n' number of tweets containing keywords in db/include.txt file using TwitterStream
+    """
+
+    def read_tweets(self, n = 3):
+        acceptable_tweets = []
+        with open('../db/include.txt','r') as reader:
+            include = reader.read()
+            
+        it = self._ts_auth.statuses.filter(track=include)
+        tweet_count = 0
+        while tweet_count < n:
+            try:
+                tweet = it.__next__()
+            except StopIteration:
+                continue
+            if tweet['user']['id_str'] != self._credentials['id_str'] and 'retweeted_status' not in tweet.keys():
+                acceptable_tweets.append(tweet) 
+                tweet_count += 1
+        return acceptable_tweets
+    
+    
+    """
+    Dump necessary information of tweets in a json file
+    """
+    def store(self, tweets, db = '../db/db.json'):
+        store_dict = {}
+
+        # Populate the dictionary taking desired attributes from tweets
+        for tweet in tweets:
+            store_dict['id'] = tweet['id']
+            store_dict['content'] = {}
+            if 'extended_tweet' in tweet.keys():
+                hashtags = ' '.join(tweet['extended_tweet']['entities']['hashtags'])
+                tweet_text = tweet['extended_tweet']['full_text']
+                store_dict['content']['text'] =  tweet_text + ' ' + hashtags 
+            else:
+                store_dict['content']['text'] = tweet['text']
+            store_dict['content']['rts'] = tweet['retweet_count']
+            store_dict['content']['favs']= tweet['favorite_count']
+        print(store_dict)
+        
+        # Save to a json file
+        with open (db, 'a') as fp:
+            json.dump(store_dict, fp)
+
+    
+    def amplify(self):
+        return

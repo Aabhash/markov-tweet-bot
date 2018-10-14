@@ -51,7 +51,7 @@ def main():
             model.load('../model/m_blk_{0}'.format(filename))
             
             tweeter.start_tweeting(time=1, keywords=keyword.split(), prefix=prefix, suffix=suffix)
-            tweeter._autotweet(model, int(n_tweets))
+            tweeter._autoconstruct(model, int(n_tweets))
         # Carve up a dictionary from read
         elif load in ['-r','-R']:
             filename, keyword, prefix, suffix, n_tweets = load_params()
@@ -60,20 +60,20 @@ def main():
             model.save('../model/m_blk_{0}'.format(filename.split('.')[0]))
 
             tweeter.start_tweeting(time=1, keywords=keyword.split(), prefix=prefix, suffix=suffix)
-            tweeter._autotweet(model, int(n_tweets))
+            tweeter._autoconstruct(model, int(n_tweets))
         # Collect tweets and store to a database
         elif load in ['c','-C']:
             no = sys.argv[2]
             db_name = sys.argv[3]
             Utility.log('main', 'Collecting {0} tweets and saving then to {1}.'.format(no, db_name))
-            tweets = Amplifier.read_tweets(no)
-            Amplifier.store(tweets, db_name)
+            tweeter.read_tweets(no)
+            tweeter.store(db_name)
         # Load a number of tweets and amplify
         elif load in ['a', '-A']:
             no = sys.argv[2]
             timeout = sys.argv[3]
             Utility.log('main', 'Tweeting {0} tweets every {1} seconds'.format(no, timeout))
-            Amplifier.amplify_tweets(no, timeout)
+            tweeter.amplify_tweets(no, timeout)
         else:
             Utility.error('main', 'Invalid parameters')
 
