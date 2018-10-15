@@ -47,7 +47,7 @@ class MarkovModel:
                 eot_index = i+1
                 break
             elif list_of_texts[i][-1] in [',',';',':']:
-                eof_index = i
+                eot_index = i
                 break
         return eot_index
 

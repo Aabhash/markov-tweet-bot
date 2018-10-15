@@ -64,10 +64,9 @@ def main():
         # Collect tweets and store to a database
         elif load in ['c','-C']:
             no = sys.argv[2]
-            db_name = sys.argv[3]
-            Utility.log('main', 'Collecting {0} tweets and saving then to {1}.'.format(no, db_name))
-            tweeter.read_tweets(no)
-            tweeter.store(db_name)
+            Utility.log('main', 'Collecting {0} tweets and saving them to db.'.format(no))
+            tweets = tweeter.read_tweets(no)
+            Tweeter.store(tweets)
         # Load a number of tweets and amplify
         elif load in ['a', '-A']:
             no = sys.argv[2]
