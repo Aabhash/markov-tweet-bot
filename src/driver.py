@@ -24,15 +24,15 @@ def main():
     """
     tweeter = Tweeter()
 
-    c_key = ''
-    c_secret = ''
-    a_token = ''
-    a_secret = ''
+    # c_key = ''
+    # c_secret = ''
+    # a_token = ''
+    # a_secret = ''
 
     """
     Login to twitter using above credentials
     """
-    tweeter.login(c_key, c_secret, a_token, a_secret)
+    # tweeter.login(c_key, c_secret, a_token, a_secret)
 
     try:
         load = sys.argv[1]
@@ -62,17 +62,17 @@ def main():
             tweeter.start_tweeting(time=1, keywords=keyword.split(), prefix=prefix, suffix=suffix)
             tweeter._autoconstruct(model, int(n_tweets))
         # Collect tweets and store to a database
-        elif load in ['c','-C']:
+        elif load in ['-c','-C']:
             no = sys.argv[2]
             Utility.log('main', 'Collecting {0} tweets and saving them to db.'.format(no))
-            tweets = tweeter.read_tweets(no)
+            tweets = tweeter.read_tweets(int(no))
             Tweeter.store(tweets)
         # Load a number of tweets and amplify
-        elif load in ['a', '-A']:
+        elif load in ['-a', '-A']:
             no = sys.argv[2]
             timeout = sys.argv[3]
             Utility.log('main', 'Tweeting {0} tweets every {1} seconds'.format(no, timeout))
-            tweeter.amplify_tweets(no, timeout)
+            tweeter.amplify_tweets(int(no), int(timeout))
         else:
             Utility.error('main', 'Invalid parameters')
 

@@ -251,6 +251,7 @@ class Tweeter:
 
                 # Write above dictionary as a row in csv file
                 writer.writerow(csv_dict)
+        Utility.log('tweeter.store','Wrote collected tweets to db {0}'.format(db))
 
     """
     Amplify stored tweet.
@@ -265,15 +266,20 @@ class Tweeter:
 
         count = 0
         while count < n and not dataframe.empty:
+            
+            # Obtain tweet and its corresponding tweet_id
             tweet = dataframe.iat[0, 3]
             tweet_id = dataframe.iat[0, 0]
-            dataframe = dataframe.drop(dataframe.index[0])
+    
             count += 1
 
             self._ts_lock.acquire(True)
             self.retweet(tweet_id, tweet)
             self._ts_lock.release()
 
+            # Update data frame after tweet extracted
+            dataframe = dataframe.drop(dataframe.index[0])
             time.sleep(timeout)
 
+        # Write updated dataframe to db
         dataframe.to_csv(db, header=False, index=False)
